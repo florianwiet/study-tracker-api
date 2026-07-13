@@ -1,0 +1,6 @@
+.venv
+__pychache__
+*.pyc
+übung.py
+.env
+.DS_Store
