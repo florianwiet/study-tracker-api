@@ -3,7 +3,7 @@ from datetime import date, datetime
 import json
 
 DATA_DIR = Path("data")
-DATA_FILE = DATA_DIR / "entrys.json"
+DATA_FILE = DATA_DIR / "entries.json"
 
 def _json_default(value):
     if isinstance(value, (date, datetime)):
