@@ -4,3 +4,5 @@ __pychache__
 übung.py
 .env
 .DS_Store
+data
+issues.json
