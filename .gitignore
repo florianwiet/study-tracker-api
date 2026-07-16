@@ -7,4 +7,5 @@ __pychache__
 data
 issues.json
 entries.json
-.vscodeentries.db
+.vscode
+entries.db
