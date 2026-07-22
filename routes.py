@@ -35,7 +35,7 @@ def get_entries(session: Session = Depends(get_session)):
 def get_entry(entry_id: str, session: Session = Depends(get_session)):
     entry = session.get(Entry, entry_id)
     if not entry:
-        raise HTTPException(status_code=404, detail="Entry not found!")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Entry not found")
     return entry
 
 
@@ -44,7 +44,7 @@ def get_entry(entry_id: str, session: Session = Depends(get_session)):
 def update_entry(entry_id: str, payload: EntryUpdate, session: Session = Depends(get_session)):
     entry = session.get(Entry, entry_id)
     if not entry:
-        raise HTTPException(status_code=404, detail="Entry not found!")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Entry not found")
     
     updates = payload.model_dump(exclude_unset=True)
     for key, value in updates.items():
@@ -60,7 +60,7 @@ def update_entry(entry_id: str, payload: EntryUpdate, session: Session = Depends
 def delete_entry(entry_id: str, session: Session = Depends(get_session)):
     entry = session.get(Entry, entry_id)
     if not entry: 
-        raise HTTPException(status_code=404, detail="Entry not found!")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Entry not found")
     
     session.delete(entry)
     session.commit()
