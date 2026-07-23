@@ -22,3 +22,9 @@ app = FastAPI(lifespan=lifespan)
 app.middleware("http")(timing_middleware)
 
 app.include_router(entries_router)
+
+
+@app.get("/health")
+def health():
+    """Health check"""
+    return {"status": "ok"}
