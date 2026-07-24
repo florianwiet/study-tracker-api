@@ -46,7 +46,7 @@ class EntryUpdate(EntryValidatorsMixin):
     date: Optional[dt.date] = Field(default=None)
 
 
-class FilterEntries(SQLModel):
+class statistics(SQLModel):
     subject: str 
     count: int 
     total_minutes: int
