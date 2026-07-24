@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from sqlmodel import Session, select
 
 from db import get_session
-from schemas import Entry, EntryCreate, EntryUpdate
+from schemas import Entry, EntryCreate, EntryUpdate, FilterEntries
 
 
 router = APIRouter(prefix="/api/v1/entries", tags=["entry"])
@@ -64,3 +64,18 @@ def delete_entry(entry_id: str, session: Session = Depends(get_session)):
     session.delete(entry)
     session.commit()
     return {"deleted":True}
+
+
+@router.get("/statistic/{subject}",response_model=FilterEntries)
+def get_statistic(subject: str, session: Session = Depends(get_session)):
+    """Get all entries for a given subject"""
+    normalised_subject = " ".join(subject.split()).casefold()
+    get_all_subject = select(Entry).where(Entry.subject == normalised_subject)
+    all_entries_subject = session.exec(get_all_subject).all()
+    if not all_entries_subject:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="subject not found")
+    return {
+        "subject": normalised_subject,
+        "count": len(all_entries_subject),
+        "total_minutes": sum(e.duration_in_minutes for e in all_entries_subject)
+    }
