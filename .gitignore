@@ -1,5 +1,5 @@
 .venv
-__pychache__
+__pycache__
 *.pyc
 übung.py
 .env
@@ -11,3 +11,4 @@ entries.json
 entries.db
 *.session.sql
 beschreibung.md
+.pytest_cache

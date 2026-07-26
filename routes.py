@@ -29,8 +29,8 @@ def get_entries(session: Session = Depends(get_session)):
     entries = session.exec(select(Entry)).all()
     return entries
     
-@router.get("/statistic", response_model=list[Entry])
-def filter(subject: Optional[str] = None, start_date: Optional[date] = None, end_date: Optional[date] = None, session: Session = Depends(get_session)):
+@router.get("/filter", response_model=list[Entry])
+def filter_entries(subject: Optional[str] = None, start_date: Optional[date] = None, end_date: Optional[date] = None, session: Session = Depends(get_session)):
     if start_date and end_date and start_date > end_date:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="start_date greater then end_date")
     statement = select(Entry)
