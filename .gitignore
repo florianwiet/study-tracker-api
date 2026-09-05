@@ -12,3 +12,5 @@ entries.db
 *.session.sql
 beschreibung.md
 .pytest_cache
+tmp_verify_test.py
+Übung
