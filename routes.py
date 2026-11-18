@@ -1,11 +1,11 @@
 import uuid
 from typing import List, Optional
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, HTTPException, Query, status, Depends
 from datetime import datetime, timezone, date
-from sqlmodel import Session, select
+from sqlmodel import Session, col, select
 
 from db import get_session
-from schemas import Entry, EntryCreate, EntryUpdate, statistics
+from schemas import Entry, EntryCreate, EntryUpdate, SubjectStatistic
 
 
 router = APIRouter(prefix="/api/v1/entries", tags=["entry"])
@@ -24,10 +24,26 @@ def create_entry(payload:EntryCreate, session: Session = Depends(get_session)):
     return new_entry
 
 @router.get("/", response_model=List[Entry])
-def get_entries(session: Session = Depends(get_session)):
-    """Get all entries"""
-    entries = session.exec(select(Entry)).all()
-    return entries
+def get_entries(
+    limit: int = Query(default=100, ge=1, le=500),
+    offset: int = Query(default=0, ge=0),
+    session: Session = Depends(get_session),
+):
+    """Get entries, newest first, paginated with limit/offset"""
+    statement = (
+        select(Entry)
+        .order_by(col(Entry.date).desc(), col(Entry.created_on).desc())
+        .offset(offset)
+        .limit(limit)
+    )
+    return session.exec(statement).all()
+
+
+@router.get("/subjects", response_model=list[str])
+def get_subjects(session: Session = Depends(get_session)):
+    """Get all distinct subjects, alphabetically"""
+    statement = select(Entry.subject).distinct().order_by(Entry.subject)
+    return session.exec(statement).all()
     
 @router.get("/filter", response_model=list[Entry])
 def filter_entries(subject: Optional[str] = None, start_date: Optional[date] = None, end_date: Optional[date] = None, session: Session = Depends(get_session)):
@@ -41,10 +57,11 @@ def filter_entries(subject: Optional[str] = None, start_date: Optional[date] = N
         statement = statement.where(Entry.date >= start_date)
     if end_date:
         statement = statement.where(Entry.date <= end_date)
+    statement = statement.order_by(col(Entry.date).desc(), col(Entry.created_on).desc())
     return session.exec(statement).all()
 
 
-@router.get("/statistic/{subject}", response_model=statistics)
+@router.get("/statistic/{subject}", response_model=SubjectStatistic)
 def get_statistic(subject: str, session: Session = Depends(get_session)):
     """Get all entries for a given subject"""
     normalised_subject = " ".join(subject.split()).casefold()
