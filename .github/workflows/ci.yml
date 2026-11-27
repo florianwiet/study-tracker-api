@@ -21,3 +21,21 @@ jobs:
 
       - name: Tests ausfuehren
         run: pytest -v
+  docker:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Docker-Image bauen
+        run: docker build -t study-tracker-api .
+
+      - name: Container starten und Health-Check pruefen
+        run: |
+          docker run -d --name api -p 8000:8000 study-tracker-api
+          for i in $(seq 1 20); do
+            curl -sf http://127.0.0.1:8000/health && exit 0
+            sleep 1
+          done
+          docker logs api
+          exit 1
